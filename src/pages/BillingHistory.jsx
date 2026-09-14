@@ -278,8 +278,10 @@ const BillingHistory = () => {
         .from('bills')
         .update({ 
           payment_status: newStatus, 
+          status: newStatus,
           paid_amount: finalPaidAmount,
           remaining_amount: remainingAmount,
+          pending_amount: remainingAmount,
           payment_updated_at: new Date().toISOString()
         })
         .eq('id', selectedBill.id);
@@ -430,14 +432,14 @@ const BillingHistory = () => {
                   </span>
                 </td>
                 <td style={{ padding: '15px 20px' }}>
-                  {!bill.payment_status || bill.payment_status === 'Paid' ? (
+                  {Math.max(0, Number(bill.total_amount) - Number(bill.paid_amount || 0)) === 0 ? (
                     <span style={{ color: '#10B981', fontSize: 12, fontWeight: 600, background: '#D1FAE5', padding: '3px 8px', borderRadius: '4px' }}>Paid</span>
-                  ) : bill.payment_status === 'Pending' ? (
+                  ) : Number(bill.paid_amount || 0) === 0 ? (
                     <span style={{ color: '#EF4444', fontSize: 12, fontWeight: 600, background: '#FEE2E2', padding: '3px 8px', borderRadius: '4px' }}>Pending</span>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                       <span style={{ color: '#F59E0B', fontSize: 12, fontWeight: 600, background: '#FEF3C7', padding: '3px 8px', borderRadius: '4px' }}>Partial</span>
-                      <span style={{ fontSize: 11, color: '#EF4444', marginTop: 4 }}>Left: ₹{Number(bill.remaining_amount).toFixed(2)}</span>
+                      <span style={{ fontSize: 11, color: '#EF4444', marginTop: 4 }}>Left: ₹{Math.max(0, Number(bill.total_amount) - Number(bill.paid_amount || 0)).toFixed(2)}</span>
                     </div>
                   )}
                 </td>
@@ -598,14 +600,14 @@ const BillingHistory = () => {
                   
                   <p style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8, fontFamily: 'var(--font-mono)' }}>Status</p>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-                    {!selectedBill.payment_status || selectedBill.payment_status === 'Paid' ? (
+                    {Math.max(0, Number(selectedBill.total_amount) - Number(selectedBill.paid_amount || 0)) === 0 ? (
                       <span style={{ color: '#10B981', fontSize: 14, fontWeight: 600 }}>Paid</span>
-                    ) : selectedBill.payment_status === 'Pending' ? (
+                    ) : Number(selectedBill.paid_amount || 0) === 0 ? (
                       <span style={{ color: '#EF4444', fontSize: 14, fontWeight: 600 }}>Pending</span>
                     ) : (
                       <>
                         <span style={{ color: '#F59E0B', fontSize: 14, fontWeight: 600 }}>Partial (Paid: ₹{Number(selectedBill.paid_amount || 0).toFixed(2)})</span>
-                        <span style={{ fontSize: 12, color: '#EF4444', fontWeight: 500 }}>Remaining: ₹{Number(selectedBill.remaining_amount || 0).toFixed(2)}</span>
+                        <span style={{ fontSize: 12, color: '#EF4444', fontWeight: 500 }}>Remaining: ₹{Math.max(0, Number(selectedBill.total_amount) - Number(selectedBill.paid_amount || 0)).toFixed(2)}</span>
                       </>
                     )}
                     {selectedBill.payment_updated_at && (
@@ -706,7 +708,7 @@ const BillingHistory = () => {
                     <span>₹{Number(selectedBill.total_amount).toFixed(2)}</span>
                   </div>
                   
-                  {selectedBill.payment_status !== 'Paid' && (
+                  {Math.max(0, Number(selectedBill.total_amount) - Number(selectedBill.paid_amount || 0)) > 0 && (
                     <>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: 4 }}>
                         <span>Paid Amount</span>
@@ -714,13 +716,13 @@ const BillingHistory = () => {
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 'bold' }}>
                         <span>Balance Due</span>
-                        <span>₹{Number(selectedBill.remaining_amount || 0).toFixed(2)}</span>
+                        <span>₹{Math.max(0, Number(selectedBill.total_amount) - Number(selectedBill.paid_amount || 0)).toFixed(2)}</span>
                       </div>
                     </>
                   )}
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginTop: 4 }}>
                     <span>Status</span>
-                    <span>{selectedBill.payment_status?.toUpperCase()}</span>
+                    <span>{Math.max(0, Number(selectedBill.total_amount) - Number(selectedBill.paid_amount || 0)) === 0 ? 'PAID' : Number(selectedBill.paid_amount || 0) === 0 ? 'PENDING' : 'PARTIAL'}</span>
                   </div>
                 </div>
 

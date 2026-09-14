@@ -168,8 +168,10 @@ app.post('/api/bills', async (req, res) => {
       total_amount: totalAmount,
       payment_method: paymentMethod,
       status: paymentStatus,
+      payment_status: paymentStatus,
       paid_amount: paidAmount,
       pending_amount: pendingAmount,
+      remaining_amount: pendingAmount,
       products: normalizedProducts,
     }]).select();
     

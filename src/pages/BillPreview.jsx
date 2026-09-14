@@ -64,8 +64,10 @@ const BillPreview = () => {
           customer_address: customerInfo.address, 
           total_amount: total,
           status: paymentStatus,
+          payment_status: paymentStatus,
           paid_amount: finalPaidAmount,
           pending_amount: remainingAmount,
+          remaining_amount: remainingAmount,
           products
         }]).select().single();
       if (billError) throw billError;

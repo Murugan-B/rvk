@@ -102,7 +102,7 @@ const Dashboard = () => {
 
       const totalSales = allBills.reduce((sum, bill) => sum + (Number(bill.total_amount) || 0), 0);
       const totalPaid = allBills.reduce((sum, bill) => sum + (Number(bill.paid_amount) || 0), 0);
-      const totalPending = allBills.reduce((sum, bill) => sum + (Number(bill.remaining_amount) || 0), 0);
+      const totalPending = allBills.reduce((sum, bill) => sum + Math.max(0, (Number(bill.total_amount) || 0) - (Number(bill.paid_amount) || 0)), 0);
       const monthlySales = monthlyBills.reduce((sum, bill) => sum + (Number(bill.total_amount) || 0), 0);
 
       setStats({
@@ -357,22 +357,22 @@ const Dashboard = () => {
                   fontWeight: 600,
                   padding: '4px 8px',
                   borderRadius: '4px',
-                  background: recentBills[0].status === 'Paid' ? '#4A8C5C20' : recentBills[0].status === 'Partial' ? '#F59E0B20' : '#C0572A20',
-                  color: recentBills[0].status === 'Paid' ? '#2F855A' : recentBills[0].status === 'Partial' ? '#D97706' : '#C0572A',
+                  background: Math.max(0, Number(recentBills[0].total_amount) - Number(recentBills[0].paid_amount || 0)) === 0 ? '#4A8C5C20' : Number(recentBills[0].paid_amount || 0) > 0 ? '#F59E0B20' : '#C0572A20',
+                  color: Math.max(0, Number(recentBills[0].total_amount) - Number(recentBills[0].paid_amount || 0)) === 0 ? '#2F855A' : Number(recentBills[0].paid_amount || 0) > 0 ? '#D97706' : '#C0572A',
                 }}>
-                  {recentBills[0].status || 'Pending'}
+                  {Math.max(0, Number(recentBills[0].total_amount) - Number(recentBills[0].paid_amount || 0)) === 0 ? 'Paid' : Number(recentBills[0].paid_amount || 0) > 0 ? 'Partial' : 'Pending'}
                 </span>
               </div>
-              {recentBills[0].paid_amount > 0 && (
+              {Number(recentBills[0].paid_amount || 0) > 0 && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                   <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Paid</span>
                   <span style={{ fontSize: 12, fontWeight: 600, color: '#2F855A' }}>₹{Number(recentBills[0].paid_amount || 0).toFixed(2)}</span>
                 </div>
               )}
-              {recentBills[0].pending_amount > 0 && (
+              {Math.max(0, Number(recentBills[0].total_amount) - Number(recentBills[0].paid_amount || 0)) > 0 && (
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Pending</span>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: '#C0572A' }}>₹{Number(recentBills[0].pending_amount || 0).toFixed(2)}</span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: '#C0572A' }}>₹{Math.max(0, Number(recentBills[0].total_amount) - Number(recentBills[0].paid_amount || 0)).toFixed(2)}</span>
                 </div>
               )}
             </div>
@@ -456,8 +456,8 @@ const Dashboard = () => {
                   <p style={{ margin: 0, color: 'var(--text-main)', fontFamily: 'var(--font-mono)', fontSize: 12 }}>
                     Rs. {Number(bill.total_amount || 0).toFixed(2)}
                   </p>
-                  <p style={{ margin: '3px 0 0', fontFamily: 'var(--font-mono)', fontSize: 11, color: bill.payment_status === 'Pending' ? '#C0572A' : '#4A8C5C' }}>
-                    {bill.payment_status || 'Paid'}
+                  <p style={{ margin: '3px 0 0', fontFamily: 'var(--font-mono)', fontSize: 11, color: Math.max(0, Number(bill.total_amount) - Number(bill.paid_amount || 0)) > 0 ? '#C0572A' : '#4A8C5C' }}>
+                    {Math.max(0, Number(bill.total_amount) - Number(bill.paid_amount || 0)) === 0 ? 'Paid' : Number(bill.paid_amount || 0) > 0 ? 'Partial' : 'Pending'}
                   </p>
                   </div>
                 </div>
