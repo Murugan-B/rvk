@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+APP_DIR="/opt/rvk"
+LOG_FILE="/tmp/rvk-server.log"
+APP_URL="http://127.0.0.1:5000"
+
+NODE_BIN="$(command -v node || command -v nodejs || true)"
+
+if [[ -z "${NODE_BIN}" ]]; then
+  echo "RVK requires Node.js to run." >"${LOG_FILE}"
+  exit 1
+fi
+
+cd "${APP_DIR}"
+
+if ! pgrep -f "${APP_DIR}/backend/server.js" >/dev/null 2>&1; then
+  nohup "${NODE_BIN}" "${APP_DIR}/backend/server.js" >"${LOG_FILE}" 2>&1 &
+fi
+
+for _ in $(seq 1 30); do
+  if exec 3<>/dev/tcp/127.0.0.1/5000; then
+    exec 3>&-
+    exec 3<&-
+    break
+  fi
+  sleep 1
+done
+
+xdg-open "${APP_URL}" >/dev/null 2>&1 || true

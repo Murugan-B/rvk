@@ -1,0 +1,9 @@
+Package: rvk-setup
+Version: 0.0.0
+Section: utils
+Priority: optional
+Architecture: all
+Depends: bash, nodejs, xdg-utils
+Maintainer: RVK Software <local@localhost>
+Description: RVK Billing System for Ubuntu
+ Local billing and stock management app packaged for Ubuntu.

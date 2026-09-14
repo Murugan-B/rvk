@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+pkill -f "/opt/rvk/backend/server.js" >/dev/null 2>&1 || true

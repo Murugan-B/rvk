@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=RVK Billing System
+Comment=Launch the RVK local billing app
+Exec=rvk
+Terminal=false
+Categories=Office;Finance;
