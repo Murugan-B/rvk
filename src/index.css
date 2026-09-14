@@ -117,8 +117,19 @@ body {
 }
 
 @media print {
+  @page {
+    size: A5;
+    margin: 10mm;
+    size: A5 portrait;
+    margin: 5mm;
+  }
   body {
     background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  * {
+    box-sizing: border-box !important;
   }
   .no-print, .print\:hidden {
     display: none !important;
@@ -149,3 +160,4 @@ body {
     margin: 0 auto !important;
   }
 }
+

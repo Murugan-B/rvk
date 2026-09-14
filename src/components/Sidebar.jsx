@@ -1,11 +1,35 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, Package, FileText, Settings, LogOut, History } from 'lucide-react';
+import { LayoutDashboard, Package, FileText, Settings as SettingsIcon, LogOut, History } from 'lucide-react';
+import { supabase } from '../services/supabase';
 
 export const Sidebar = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const [settings, setSettings] = useState({});
+
+  useEffect(() => {
+    fetchSettings();
+    
+    const handleSettingsUpdate = () => {
+      fetchSettings();
+    };
+    
+    window.addEventListener('settings-updated', handleSettingsUpdate);
+    return () => {
+      window.removeEventListener('settings-updated', handleSettingsUpdate);
+    };
+  }, []);
+
+  const fetchSettings = async () => {
+    try {
+      const { data } = await supabase.from('settings').select('logo_url, company_name').limit(1).single();
+      if (data) setSettings(data);
+    } catch (error) {
+      console.error('Failed to fetch settings in sidebar:', error);
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -17,7 +41,7 @@ export const Sidebar = () => {
     { to: '/inventory', icon: <Package size={20} />, label: 'Inventory' },
     { to: '/billing', icon: <FileText size={20} />, label: 'Billing' },
     { to: '/billing-history', icon: <History size={20} />, label: 'Billing History' },
-    { to: '/settings', icon: <Settings size={20} />, label: 'Settings' },
+    { to: '/settings', icon: <SettingsIcon size={20} />, label: 'Settings' },
   ];
 
   return (
@@ -32,14 +56,32 @@ export const Sidebar = () => {
       }}
     >
       <div 
-        className="p-4 md:p-6 text-2xl font-bold border-b" 
+        className="p-4 md:p-6 border-b flex flex-col items-start gap-4" 
         style={{ 
-          fontFamily: 'var(--font-serif)', 
           borderColor: 'var(--bg-sidebar-hover)',
-          color: 'var(--accent-primary)'
         }}
       >
-        Stock Billing
+        {settings.logo_url && (
+          <img 
+            src={settings.logo_url} 
+            alt="Company Logo" 
+            style={{ 
+              maxWidth: '100%', 
+              maxHeight: '48px', 
+              objectFit: 'contain',
+              borderRadius: '6px'
+            }} 
+          />
+        )}
+        <div 
+          className="text-2xl font-bold"
+          style={{ 
+            fontFamily: 'var(--font-serif)', 
+            color: 'var(--accent-primary)'
+          }}
+        >
+          {settings.company_name || 'Stock Billing'}
+        </div>
       </div>
       <nav className="flex-1 p-4 space-y-2">
         {navItems.map((item) => (

@@ -119,98 +119,122 @@ const BillPreview = () => {
         </button>
       </div>
 
-      {/* Invoice Card - POS Thermal Receipt Style */}
+      {/* Invoice Card - A5 Layout */}
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <div style={{ width: '100%', maxWidth: '340px', background: '#FFFFFF', padding: '24px 20px', borderRadius: '8px', boxShadow: 'var(--shadow-md)', color: '#000', fontFamily: "'Courier New', Courier, monospace", fontSize: '13px', lineHeight: 1.4 }}>
+        <div style={{ width: '100%', height: '100%', maxWidth: '148mm', maxHeight: '198mm', background: '#FFFFFF', padding: '15px', borderRadius: '8px', boxShadow: 'var(--shadow-md)', color: '#000', fontFamily: 'var(--font-sans)', fontSize: '12px', lineHeight: 1.4, boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }} className="print:shadow-none print:m-0 print:rounded-none">
           {/* Receipt Header */}
-          <div style={{ textAlign: 'center', marginBottom: 16 }}>
-            {settings.logo_url && <img src={settings.logo_url} alt="Logo" style={{ height: 48, marginBottom: 8, filter: 'grayscale(100%)' }} />}
-            <h2 style={{ margin: '0 0 4px', fontSize: '18px', fontWeight: 'bold', textTransform: 'uppercase' }}>{settings.company_name || 'STORE NAME'}</h2>
-            {settings.address && <p style={{ margin: '0 0 2px', whiteSpace: 'pre-wrap', fontSize: '11px' }}>{settings.address}</p>}
-            {settings.phone && <p style={{ margin: '0 0 2px', fontSize: '11px' }}>Ph: {settings.phone}</p>}
-            {settings.gst_number && <p style={{ margin: '0 0 2px', fontSize: '11px' }}>GST: {settings.gst_number}</p>}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12, borderBottom: '2px solid #EEE', paddingBottom: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+              {settings.logo_url && <img src={settings.logo_url} alt="Logo" style={{ height: 40, borderRadius: '4px' }} />}
+              <div>
+                <h2 style={{ margin: '0 0 2px', fontSize: '16px', fontWeight: 'bold', textTransform: 'uppercase', fontFamily: 'var(--font-serif)', color: 'var(--text-main)' }}>{settings.company_name || 'STORE NAME'}</h2>
+                {settings.address && <p style={{ margin: '0 0 2px', whiteSpace: 'pre-wrap', fontSize: '11px', color: '#555' }}>{settings.address}</p>}
+                {settings.phone && <p style={{ margin: '0 0 2px', fontSize: '11px', color: '#555' }}>Ph: {settings.phone}</p>}
+                {settings.gst_number && <p style={{ margin: '0 0 2px', fontSize: '11px', color: '#555' }}>GST: {settings.gst_number}</p>}
+              </div>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <p style={{ fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.15em', color: 'var(--accent-primary)', textTransform: 'uppercase', marginBottom: 2 }}>Invoice</p>
+              {billGenerated && <p style={{ fontFamily: 'var(--font-serif)', fontSize: 16, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>INV-{String(billId).padStart(5, '0')}</p>}
+            </div>
           </div>
-
-          <div style={{ borderBottom: '1px dashed #000', marginBottom: 12 }} />
 
           {/* Receipt Info */}
-          <div style={{ marginBottom: 12, fontSize: '12px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-              <span>Date: {new Date().toLocaleDateString('en-IN')}</span>
-              <span>{new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
-            </div>
-            {billGenerated && (
-              <div style={{ marginBottom: 4 }}>Receipt No: INV-{String(billId).padStart(5, '0')}</div>
-            )}
-            
-            {!billGenerated ? (
-              <div style={{ marginTop: 8, padding: '8px', border: '1px dotted #ccc' }} className="print:hidden">
-                <p style={{ margin: '0 0 6px', fontWeight: 'bold', fontSize: 11 }}>Customer Details (Optional)</p>
-                <input type="text" style={{ width: '100%', padding: '4px', marginBottom: 4, fontSize: 12, border: '1px solid #ccc' }} placeholder="Name" value={customerInfo.name} onChange={e => setCustomerInfo({...customerInfo, name: e.target.value})} />
-                <input type="text" style={{ width: '100%', padding: '4px', fontSize: 12, border: '1px solid #ccc' }} placeholder="Phone" value={customerInfo.phone} onChange={e => setCustomerInfo({...customerInfo, phone: e.target.value})} />
-              </div>
-            ) : (
-              customerInfo.name && (
-                <div style={{ marginTop: 4 }}>
-                  <div>Customer: {customerInfo.name}</div>
-                  {customerInfo.phone && <div>Ph: {customerInfo.phone}</div>}
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12, fontSize: '11px', color: '#333' }}>
+            <div style={{ flex: 1 }}>
+              <p style={{ margin: '0 0 2px', fontWeight: 600, color: 'var(--text-main)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Bill To:</p>
+              {!billGenerated ? (
+                <div style={{ marginTop: 8 }} className="print:hidden">
+                  <input type="text" style={inputStyle('name')} placeholder="Customer Name" value={customerInfo.name} onChange={e => setCustomerInfo({...customerInfo, name: e.target.value})} />
+                  <div style={{ height: 8 }} />
+                  <input type="text" style={inputStyle('phone')} placeholder="Phone Number" value={customerInfo.phone} onChange={e => setCustomerInfo({...customerInfo, phone: e.target.value})} />
                 </div>
-              )
-            )}
+              ) : (
+                customerInfo.name ? (
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: 12 }}>{customerInfo.name}</div>
+                    {customerInfo.phone && <div style={{ color: '#555', marginTop: 2 }}>Ph: {customerInfo.phone}</div>}
+                  </div>
+                ) : (
+                  <div style={{ color: '#888', fontStyle: 'italic' }}>Walk-in Customer</div>
+                )
+              )}
+            </div>
+            
+            <div style={{ textAlign: 'right', flex: 1 }}>
+              <p style={{ margin: '0 0 2px', fontWeight: 600, color: 'var(--text-main)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Date:</p>
+              <div style={{ fontSize: 12 }}>{new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+              <div style={{ color: '#555', marginTop: 2 }}>{new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</div>
+            </div>
           </div>
-
-          <div style={{ borderBottom: '1px dashed #000', marginBottom: 12 }} />
 
           {/* Items Table */}
-          <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 16 }}>
-            <thead>
-              <tr>
-                <th style={{ textAlign: 'left', paddingBottom: 6, borderBottom: '1px dashed #000', fontWeight: 'bold' }}>ITEM</th>
-                <th style={{ textAlign: 'center', paddingBottom: 6, borderBottom: '1px dashed #000', fontWeight: 'bold' }}>QTY</th>
-                <th style={{ textAlign: 'right', paddingBottom: 6, borderBottom: '1px dashed #000', fontWeight: 'bold' }}>AMT</th>
-              </tr>
-            </thead>
-            <tbody>
-              {displayCart.map((item, idx) => (
-                <tr key={idx}>
-                  <td style={{ padding: '8px 0', verticalAlign: 'top', paddingRight: '4px' }}>
-                    <div style={{ fontWeight: 'bold' }}>{item.name}</div>
-                    <div style={{ fontSize: '11px', color: '#444' }}>@ ₹{Number(item.price).toFixed(2)}</div>
-                  </td>
-                  <td style={{ padding: '8px 0', textAlign: 'center', verticalAlign: 'top' }}>{item.qty}</td>
-                  <td style={{ padding: '8px 0', textAlign: 'right', verticalAlign: 'top' }}>₹{(Number(item.price) * item.qty).toFixed(2)}</td>
+          <div style={{ flex: 1 }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 12, fontSize: '12px' }}>
+              <thead>
+                <tr>
+                  <th style={{ textAlign: 'left', padding: '6px 0', borderBottom: '2px solid #EEE', fontWeight: 600, color: 'var(--text-muted)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Item Description</th>
+                  <th style={{ textAlign: 'center', padding: '6px 0', borderBottom: '2px solid #EEE', fontWeight: 600, color: 'var(--text-muted)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Qty</th>
+                  <th style={{ textAlign: 'right', padding: '6px 0', borderBottom: '2px solid #EEE', fontWeight: 600, color: 'var(--text-muted)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Price</th>
+                  <th style={{ textAlign: 'right', padding: '6px 0', borderBottom: '2px solid #EEE', fontWeight: 600, color: 'var(--text-muted)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Amount</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {displayCart.map((item, idx) => (
+                  <tr key={idx}>
+                    <td style={{ padding: '6px 0', verticalAlign: 'top', borderBottom: '1px solid #F1F5F9' }}>
+                      <div style={{ fontWeight: 500, color: 'var(--text-main)' }}>{item.name}</div>
+                    </td>
+                    <td style={{ padding: '6px 0', textAlign: 'center', verticalAlign: 'top', borderBottom: '1px solid #F1F5F9' }}>{item.qty}</td>
+                    <td style={{ padding: '6px 0', textAlign: 'right', verticalAlign: 'top', borderBottom: '1px solid #F1F5F9' }}>₹{Number(item.price).toFixed(2)}</td>
+                    <td style={{ padding: '6px 0', textAlign: 'right', verticalAlign: 'top', borderBottom: '1px solid #F1F5F9', fontWeight: 500 }}>₹{(Number(item.price) * item.qty).toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-          <div style={{ borderTop: '1px dashed #000', paddingTop: 12, marginBottom: 16 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '16px', marginBottom: 8 }}>
-              <span>TOTAL</span>
-              <span>₹{total.toFixed(2)}</span>
-            </div>
-            
-            {paymentStatus !== 'Paid' && (
-              <>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: 4 }}>
-                  <span>Paid Amount</span>
-                  <span>₹{paymentStatus === 'Pending' ? '0.00' : (Number(paidAmount) || 0).toFixed(2)}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 'bold' }}>
-                  <span>Balance Due</span>
-                  <span>₹{paymentStatus === 'Pending' ? total.toFixed(2) : Math.max(0, total - (Number(paidAmount) || 0)).toFixed(2)}</span>
-                </div>
-              </>
-            )}
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginTop: 4 }}>
-              <span>Status</span>
-              <span>{paymentStatus.toUpperCase()}</span>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: 8, pageBreakInside: 'avoid' }}>
+            <div style={{ width: '60%' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: '12px', color: '#555' }}>
+                <span>Subtotal</span>
+                <span>₹{total.toFixed(2)}</span>
+              </div>
+              
+              {paymentStatus !== 'Paid' && (
+                <>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: '12px', color: '#555' }}>
+                    <span>Paid Amount</span>
+                    <span>₹{paymentStatus === 'Pending' ? '0.00' : (Number(paidAmount) || 0).toFixed(2)}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: '12px', fontWeight: 600, color: '#EF4444' }}>
+                    <span>Balance Due</span>
+                    <span>₹{paymentStatus === 'Pending' ? total.toFixed(2) : Math.max(0, total - (Number(paidAmount) || 0)).toFixed(2)}</span>
+                  </div>
+                </>
+              )}
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', fontSize: '14px', fontWeight: 'bold', borderTop: '2px solid #EEE', borderBottom: '2px double #EEE', marginTop: 4, color: 'var(--text-main)' }}>
+                <span>Total</span>
+                <span>₹{total.toFixed(2)}</span>
+              </div>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, fontSize: '11px', fontWeight: 600 }}>
+                <span style={{ color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</span>
+                <span style={{ 
+                  color: paymentStatus === 'Paid' ? '#10B981' : paymentStatus === 'Pending' ? '#EF4444' : '#F59E0B',
+                  background: paymentStatus === 'Paid' ? '#D1FAE5' : paymentStatus === 'Pending' ? '#FEE2E2' : '#FEF3C7',
+                  padding: '2px 8px', borderRadius: '4px'
+                }}>
+                  {paymentStatus.toUpperCase()}
+                </span>
+              </div>
             </div>
           </div>
 
-          <div style={{ borderTop: '1px dashed #000', paddingTop: 16, textAlign: 'center' }}>
-            <p style={{ margin: '0 0 4px', fontWeight: 'bold', fontSize: '14px' }}>THANK YOU!</p>
-            <p style={{ margin: 0, fontSize: '11px' }}>Please visit again</p>
+          <div style={{ marginTop: 'auto', paddingTop: 12, borderTop: '1px solid #EEE', textAlign: 'center', color: '#888', fontSize: '10px', pageBreakInside: 'avoid' }}>
+            <p style={{ margin: '0 0 2px', fontWeight: 600, color: '#555' }}>Thank you for your business!</p>
+            <p style={{ margin: 0 }}>This is a computer-generated invoice and requires no signature.</p>
           </div>
         </div>
       </div>

@@ -496,8 +496,8 @@ const BillingHistory = () => {
       </div>
 
       {selectedBill && (
-        <div className="modal-overlay print:!static print:!bg-transparent print:!p-0" style={{ zIndex: 1000 }}>
-          <div className="modal-content print:!static print:!shadow-none print:!border-none print:!m-0 print:!max-w-none print:!max-h-none print:!overflow-visible" style={{ maxWidth: 700, maxHeight: '90vh', display: 'flex', flexDirection: 'column', padding: 0, overflow: 'hidden' }}>
+        <div className="modal-overlay print:static! print:bg-transparent! print:p-0!" style={{ zIndex: 1000 }}>
+          <div className="modal-content print:static! print:shadow-none! print:border-none! print:m-0! print:max-w-none! print:max-h-none! print:overflow-visible!" style={{ maxWidth: 700, maxHeight: '90vh', display: 'flex', flexDirection: 'column', padding: 0, overflow: 'hidden' }}>
             {/* Modal Accent */}
             <div className="print:hidden" style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, background: 'var(--accent-primary)', zIndex: 1 }} />
             
@@ -650,85 +650,110 @@ const BillingHistory = () => {
 
             </div>
 
-            {/* POS Thermal Receipt (Off-screen for htmlToImage and Print) */}
+            {/* Printable Invoice (A5 layout) */}
             <div className="offscreen-receipt">
-              <div ref={billImageRef} style={{ width: '100%', maxWidth: '340px', background: '#FFFFFF', color: '#000', fontFamily: "'Courier New', Courier, monospace", fontSize: '13px', lineHeight: 1.4, padding: '24px 20px' }}>
-                <div style={{ textAlign: 'center', marginBottom: 16 }}>
-                  {settings.logo_url && <img src={settings.logo_url} alt="Logo" style={{ height: 48, marginBottom: 8, filter: 'grayscale(100%)' }} />}
-                  <h2 style={{ margin: '0 0 4px', fontSize: '18px', fontWeight: 'bold', textTransform: 'uppercase' }}>{settings.company_name || 'STORE NAME'}</h2>
-                  {settings.address && <p style={{ margin: '0 0 2px', whiteSpace: 'pre-wrap', fontSize: '11px' }}>{settings.address}</p>}
-                  {settings.phone && <p style={{ margin: '0 0 2px', fontSize: '11px' }}>Ph: {settings.phone}</p>}
-                  {settings.gst_number && <p style={{ margin: '0 0 2px', fontSize: '11px' }}>GST: {settings.gst_number}</p>}
-                </div>
-
-                <div style={{ borderBottom: '1px dashed #000', marginBottom: 12 }} />
-
-                <div style={{ marginBottom: 12, fontSize: '12px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                    <span>Date: {new Date(selectedBill.created_at).toLocaleDateString('en-IN')}</span>
-                    <span>{new Date(selectedBill.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
-                  </div>
-                  <div style={{ marginBottom: 4 }}>Receipt No: INV-{String(selectedBill.id).padStart(5, '0')}</div>
-                  
-                  {selectedBill.customer_name && (
-                    <div style={{ marginTop: 4 }}>
-                      <div>Customer: {selectedBill.customer_name}</div>
-                      {selectedBill.customer_phone && <div>Ph: {selectedBill.customer_phone}</div>}
+              <div ref={billImageRef} style={{ width: '100%', height: '100%', maxHeight: '198mm', background: '#FFFFFF', color: '#000', fontFamily: 'var(--font-sans)', fontSize: '12px', lineHeight: 1.4, padding: '15px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12, borderBottom: '2px solid #EEE', paddingBottom: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                    {settings.logo_url && <img src={settings.logo_url} alt="Logo" style={{ height: 40, borderRadius: '4px' }} />}
+                    <div>
+                      <h2 style={{ margin: '0 0 2px', fontSize: '16px', fontWeight: 'bold', textTransform: 'uppercase', fontFamily: 'var(--font-serif)', color: 'var(--text-main)' }}>{settings.company_name || 'STORE NAME'}</h2>
+                      {settings.address && <p style={{ margin: '0 0 2px', whiteSpace: 'pre-wrap', fontSize: '11px', color: '#555' }}>{settings.address}</p>}
+                      {settings.phone && <p style={{ margin: '0 0 2px', fontSize: '11px', color: '#555' }}>Ph: {settings.phone}</p>}
+                      {settings.gst_number && <p style={{ margin: '0 0 2px', fontSize: '11px', color: '#555' }}>GST: {settings.gst_number}</p>}
                     </div>
-                  )}
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <p style={{ fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.15em', color: 'var(--accent-primary)', textTransform: 'uppercase', marginBottom: 2 }}>Invoice</p>
+                    <p style={{ fontFamily: 'var(--font-serif)', fontSize: 16, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>INV-{String(selectedBill.id).padStart(5, '0')}</p>
+                  </div>
                 </div>
 
-                <div style={{ borderBottom: '1px dashed #000', marginBottom: 12 }} />
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12, fontSize: '11px', color: '#333' }}>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ margin: '0 0 2px', fontWeight: 600, color: 'var(--text-main)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Bill To:</p>
+                    {selectedBill.customer_name ? (
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: 12 }}>{selectedBill.customer_name}</div>
+                        {selectedBill.customer_phone && <div style={{ color: '#555', marginTop: 2 }}>Ph: {selectedBill.customer_phone}</div>}
+                      </div>
+                    ) : (
+                      <div style={{ color: '#888', fontStyle: 'italic' }}>Walk-in Customer</div>
+                    )}
+                  </div>
+                  <div style={{ textAlign: 'right', flex: 1 }}>
+                    <p style={{ margin: '0 0 2px', fontWeight: 600, color: 'var(--text-main)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Date:</p>
+                    <div style={{ fontSize: 12 }}>{new Date(selectedBill.created_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                    <div style={{ color: '#555', marginTop: 2 }}>{new Date(selectedBill.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</div>
+                  </div>
+                </div>
 
-                <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 16 }}>
-                  <thead>
-                    <tr>
-                      <th style={{ textAlign: 'left', paddingBottom: 6, borderBottom: '1px dashed #000', fontWeight: 'bold' }}>ITEM</th>
-                      <th style={{ textAlign: 'center', paddingBottom: 6, borderBottom: '1px dashed #000', fontWeight: 'bold' }}>QTY</th>
-                      <th style={{ textAlign: 'right', paddingBottom: 6, borderBottom: '1px dashed #000', fontWeight: 'bold' }}>AMT</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {billItems?.map((item, idx) => (
-                      <tr key={idx}>
-                        <td style={{ padding: '8px 0', verticalAlign: 'top', paddingRight: '4px' }}>
-                          <div style={{ fontWeight: 'bold' }}>{getItemName(item)}</div>
-                          <div style={{ fontSize: '11px', color: '#444' }}>@ ₹{getItemPrice(item).toFixed(2)}</div>
-                        </td>
-                        <td style={{ padding: '8px 0', textAlign: 'center', verticalAlign: 'top' }}>{item.quantity}</td>
-                        <td style={{ padding: '8px 0', textAlign: 'right', verticalAlign: 'top' }}>₹{(getItemPrice(item) * item.quantity).toFixed(2)}</td>
+                <div style={{ flex: 1 }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 12, fontSize: '12px' }}>
+                    <thead>
+                      <tr>
+                        <th style={{ textAlign: 'left', padding: '6px 0', borderBottom: '2px solid #EEE', fontWeight: 600, color: 'var(--text-muted)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Item Description</th>
+                        <th style={{ textAlign: 'center', padding: '6px 0', borderBottom: '2px solid #EEE', fontWeight: 600, color: 'var(--text-muted)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Qty</th>
+                        <th style={{ textAlign: 'right', padding: '6px 0', borderBottom: '2px solid #EEE', fontWeight: 600, color: 'var(--text-muted)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Price</th>
+                        <th style={{ textAlign: 'right', padding: '6px 0', borderBottom: '2px solid #EEE', fontWeight: 600, color: 'var(--text-muted)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Amount</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {billItems?.map((item, idx) => (
+                        <tr key={idx}>
+                          <td style={{ padding: '6px 0', verticalAlign: 'top', borderBottom: '1px solid #F1F5F9' }}>
+                            <div style={{ fontWeight: 500, color: 'var(--text-main)' }}>{getItemName(item)}</div>
+                          </td>
+                          <td style={{ padding: '6px 0', textAlign: 'center', verticalAlign: 'top', borderBottom: '1px solid #F1F5F9' }}>{item.quantity}</td>
+                          <td style={{ padding: '6px 0', textAlign: 'right', verticalAlign: 'top', borderBottom: '1px solid #F1F5F9' }}>₹{getItemPrice(item).toFixed(2)}</td>
+                          <td style={{ padding: '6px 0', textAlign: 'right', verticalAlign: 'top', borderBottom: '1px solid #F1F5F9', fontWeight: 500 }}>₹{(getItemPrice(item) * item.quantity).toFixed(2)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
 
-                <div style={{ borderTop: '1px dashed #000', paddingTop: 12, marginBottom: 16 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '16px', marginBottom: 8 }}>
-                    <span>TOTAL</span>
-                    <span>₹{Number(selectedBill.total_amount).toFixed(2)}</span>
-                  </div>
-                  
-                  {Math.max(0, Number(selectedBill.total_amount) - Number(selectedBill.paid_amount || 0)) > 0 && (
-                    <>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: 4 }}>
-                        <span>Paid Amount</span>
-                        <span>₹{Number(selectedBill.paid_amount || 0).toFixed(2)}</span>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 'bold' }}>
-                        <span>Balance Due</span>
-                        <span>₹{Math.max(0, Number(selectedBill.total_amount) - Number(selectedBill.paid_amount || 0)).toFixed(2)}</span>
-                      </div>
-                    </>
-                  )}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginTop: 4 }}>
-                    <span>Status</span>
-                    <span>{Math.max(0, Number(selectedBill.total_amount) - Number(selectedBill.paid_amount || 0)) === 0 ? 'PAID' : Number(selectedBill.paid_amount || 0) === 0 ? 'PENDING' : 'PARTIAL'}</span>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: 8, pageBreakInside: 'avoid' }}>
+                  <div style={{ width: '60%' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: '12px', color: '#555' }}>
+                      <span>Subtotal</span>
+                      <span>₹{Number(selectedBill.total_amount).toFixed(2)}</span>
+                    </div>
+                    
+                    {Math.max(0, Number(selectedBill.total_amount) - Number(selectedBill.paid_amount || 0)) > 0 && (
+                      <>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: '12px', color: '#555' }}>
+                          <span>Paid Amount</span>
+                          <span>₹{Number(selectedBill.paid_amount || 0).toFixed(2)}</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: '12px', fontWeight: 600, color: '#EF4444' }}>
+                          <span>Balance Due</span>
+                          <span>₹{Math.max(0, Number(selectedBill.total_amount) - Number(selectedBill.paid_amount || 0)).toFixed(2)}</span>
+                        </div>
+                      </>
+                    )}
+                    
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', fontSize: '14px', fontWeight: 'bold', borderTop: '2px solid #EEE', borderBottom: '2px double #EEE', marginTop: 4, color: 'var(--text-main)' }}>
+                      <span>Total</span>
+                      <span>₹{Number(selectedBill.total_amount).toFixed(2)}</span>
+                    </div>
+                    
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, fontSize: '11px', fontWeight: 600 }}>
+                      <span style={{ color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</span>
+                      <span style={{ 
+                        color: Math.max(0, Number(selectedBill.total_amount) - Number(selectedBill.paid_amount || 0)) === 0 ? '#10B981' : Number(selectedBill.paid_amount || 0) === 0 ? '#EF4444' : '#F59E0B',
+                        background: Math.max(0, Number(selectedBill.total_amount) - Number(selectedBill.paid_amount || 0)) === 0 ? '#D1FAE5' : Number(selectedBill.paid_amount || 0) === 0 ? '#FEE2E2' : '#FEF3C7',
+                        padding: '2px 8px', borderRadius: '4px'
+                      }}>
+                        {Math.max(0, Number(selectedBill.total_amount) - Number(selectedBill.paid_amount || 0)) === 0 ? 'PAID' : Number(selectedBill.paid_amount || 0) === 0 ? 'PENDING' : 'PARTIAL'}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                <div style={{ borderTop: '1px dashed #000', paddingTop: 16, textAlign: 'center' }}>
-                  <p style={{ margin: '0 0 4px', fontWeight: 'bold', fontSize: '14px' }}>THANK YOU!</p>
-                  <p style={{ margin: 0, fontSize: '11px' }}>Please visit again</p>
+                <div style={{ marginTop: 'auto', paddingTop: 12, borderTop: '1px solid #EEE', textAlign: 'center', color: '#888', fontSize: '10px', pageBreakInside: 'avoid' }}>
+                  <p style={{ margin: '0 0 2px', fontWeight: 600, color: '#555' }}>Thank you for your business!</p>
+                  <p style={{ margin: 0 }}>This is a computer-generated invoice and requires no signature.</p>
                 </div>
               </div>
             </div>

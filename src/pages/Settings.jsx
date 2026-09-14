@@ -57,6 +57,7 @@ const Settings = () => {
       }
       toast.success('Settings saved successfully!');
       fetchSettings();
+      window.dispatchEvent(new Event('settings-updated'));
     } catch (error) {
       toast.error('Failed to save settings');
       console.error(error);

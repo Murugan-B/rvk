@@ -208,71 +208,105 @@ const Dashboard = () => {
             <meta charset="utf-8" />
             <title>Bill #${bill.id}</title>
             <style>
-              @page { margin: 8mm; }
-              body { margin: 0; padding: 24px; font-family: 'Courier New', Courier, monospace; background: #fff; color: #000; font-size: 13px; line-height: 1.4; }
-              .receipt { width: 340px; max-width: 100%; margin: 0 auto; padding: 24px 20px; background: #fff; color: #000; }
-              .center { text-align: center; }
-              .divider { border-bottom: 1px dashed #000; margin: 12px 0; }
-              .row { display: flex; justify-content: space-between; gap: 12px; }
-              .meta { font-size: 12px; margin-bottom: 12px; }
-              .title { margin: 0; font-size: 18px; font-weight: bold; text-transform: uppercase; }
-              .company { margin: 0 0 4px; font-size: 18px; font-weight: bold; text-transform: uppercase; }
-              table { width: 100%; border-collapse: collapse; }
-              thead th { text-align: left; padding-bottom: 6px; border-bottom: 1px dashed #000; font-weight: bold; font-size: 12px; }
-              .total-block { border-top: 1px dashed #000; padding-top: 12px; margin-top: 12px; }
-              .total-line { display: flex; justify-content: space-between; font-weight: bold; font-size: 16px; margin-bottom: 8px; }
-              .footer { border-top: 1px dashed #000; padding-top: 16px; text-align: center; margin-top: 16px; }
-              img { max-height: 48px; margin-bottom: 8px; filter: grayscale(100%); }
+              @page { size: A5 portrait; margin: 5mm; }
+              * { box-sizing: border-box; }
+              body { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: #fff; color: #333; font-size: 12px; line-height: 1.4; }
+              .receipt { width: 100%; height: 100%; max-height: 198mm; padding: 10px; background: #fff; color: #000; display: flex; flex-direction: column; }
+              .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; border-bottom: 2px solid #EEE; padding-bottom: 12px; }
+              .company-info { display: flex; gap: 12px; align-items: flex-start; }
+              .company-name { margin: 0 0 2px; font-size: 16px; font-weight: bold; text-transform: uppercase; color: #111; }
+              .invoice-title { margin: 0 0 2px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.1em; color: #666; }
+              .invoice-no { margin: 0; font-size: 16px; font-weight: bold; color: #111; }
+              .meta-section { display: flex; justify-content: space-between; margin-bottom: 12px; }
+              .meta-block { flex: 1; }
+              .meta-label { font-size: 10px; font-weight: bold; text-transform: uppercase; color: #666; margin: 0 0 2px; letter-spacing: 0.05em; }
+              table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+              thead th { text-align: left; padding: 6px 0; border-bottom: 2px solid #EEE; font-weight: bold; font-size: 10px; color: #666; text-transform: uppercase; }
+              tbody td { padding: 6px 0; vertical-align: top; border-bottom: 1px solid #F5F5F5; font-size: 12px; }
+              .content-area { flex: 1; }
+              .total-block { width: 60%; float: right; padding-top: 8px; page-break-inside: avoid; }
+              .total-line { display: flex; justify-content: space-between; padding: 4px 0; color: #555; font-size: 12px; }
+              .total-final { display: flex; justify-content: space-between; font-weight: bold; font-size: 14px; margin-top: 4px; padding: 8px 0; border-top: 2px solid #EEE; border-bottom: 2px double #EEE; color: #111; }
+              .footer { border-top: 1px solid #EEE; padding-top: 12px; text-align: center; margin-top: auto; clear: both; color: #888; font-size: 10px; page-break-inside: avoid; }
+              img { max-height: 40px; border-radius: 4px; }
             </style>
           </head>
           <body>
             <div class="receipt">
-              <div class="center">
-                ${settings.logo_url ? `<img src="${escapeHtml(settings.logo_url)}" alt="Logo" />` : ''}
-                <p class="company">${escapeHtml(settings.company_name || 'STORE NAME')}</p>
-                ${settings.address ? `<p style="margin: 0 0 2px; white-space: pre-wrap; font-size: 11px;">${escapeHtml(settings.address)}</p>` : ''}
-                ${settings.phone ? `<p style="margin: 0 0 2px; font-size: 11px;">Ph: ${escapeHtml(settings.phone)}</p>` : ''}
-                ${settings.gst_number ? `<p style="margin: 0 0 2px; font-size: 11px;">GST: ${escapeHtml(settings.gst_number)}</p>` : ''}
+              <div class="header">
+                <div class="company-info">
+                  ${settings.logo_url ? `<img src="${escapeHtml(settings.logo_url)}" alt="Logo" />` : ''}
+                  <div>
+                    <p class="company-name">${escapeHtml(settings.company_name || 'STORE NAME')}</p>
+                    ${settings.address ? `<p style="margin: 0 0 2px; font-size: 12px; color: #555; max-width: 200px;">${escapeHtml(settings.address)}</p>` : ''}
+                    ${settings.phone ? `<p style="margin: 0 0 2px; font-size: 12px; color: #555;">Ph: ${escapeHtml(settings.phone)}</p>` : ''}
+                    ${settings.gst_number ? `<p style="margin: 0 0 2px; font-size: 12px; color: #555;">GST: ${escapeHtml(settings.gst_number)}</p>` : ''}
+                  </div>
+                </div>
+                <div style="text-align: right;">
+                  <p class="invoice-title">Invoice</p>
+                  <p class="invoice-no">INV-${String(bill.id).padStart(5, '0')}</p>
+                </div>
               </div>
 
-              <div class="divider"></div>
-
-              <div class="meta">
-                <div class="row"><span>Date: ${escapeHtml(formattedDate)}</span><span>${escapeHtml(formattedTime)}</span></div>
-                <div style="margin-top: 4px;">Receipt No: INV-${String(bill.id).padStart(5, '0')}</div>
-                <div style="margin-top: 4px;">Customer: ${escapeHtml(bill.customer_name || 'Walk-in Customer')}</div>
-                ${bill.customer_phone ? `<div>Ph: ${escapeHtml(bill.customer_phone)}</div>` : ''}
-                <div>Status: ${escapeHtml(bill.payment_status || 'Paid')}</div>
+              <div class="meta-section">
+                <div class="meta-block">
+                  <p class="meta-label">Bill To:</p>
+                  <div style="font-weight: bold; font-size: 13px; color: #111;">${escapeHtml(bill.customer_name || 'Walk-in Customer')}</div>
+                  ${bill.customer_phone ? `<div style="color: #555; margin-top: 2px; font-size: 12px;">Ph: ${escapeHtml(bill.customer_phone)}</div>` : ''}
+                </div>
+                <div class="meta-block" style="text-align: right;">
+                  <p class="meta-label">Date:</p>
+                  <div style="font-size: 13px; color: #111;">${escapeHtml(formattedDate)}</div>
+                  <div style="color: #555; margin-top: 2px; font-size: 12px;">${escapeHtml(formattedTime)}</div>
+                </div>
               </div>
 
-              <div class="divider"></div>
-
-              <table>
-                <thead>
-                  <tr>
-                    <th style="width: 60%;">ITEM</th>
-                    <th style="width: 15%; text-align: center;">QTY</th>
-                    <th style="width: 25%; text-align: right;">AMT</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${rows || '<tr><td colspan="3" style="padding: 8px 0;">No items found</td></tr>'}
-                </tbody>
-              </table>
+              <div class="content-area">
+                <table>
+                  <thead>
+                    <tr>
+                      <th style="width: 50%;">Item Description</th>
+                      <th style="width: 15%; text-align: center;">Qty</th>
+                      <th style="width: 15%; text-align: right;">Price</th>
+                      <th style="width: 20%; text-align: right;">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${items.map((item, index) => {
+                      const itemName = item.product_name || item.name || "Item " + (index + 1);
+                      const qty = Number(item.quantity || 0);
+                      const price = Number(item.unit_price ?? (item.price || 0));
+                      const lineTotal = qty * price;
+                      return '<tr>' +
+                        '<td><div style="font-weight: 500; color: #111;">' + escapeHtml(itemName) + '</div></td>' +
+                        '<td style="text-align: center;">' + qty + '</td>' +
+                        '<td style="text-align: right;">₹' + price.toFixed(2) + '</td>' +
+                        '<td style="text-align: right; font-weight: 500; color: #111;">₹' + lineTotal.toFixed(2) + '</td>' +
+                      '</tr>';
+                    }).join('') || '<tr><td colspan="4" style="padding: 16px 0; text-align: center; color: #888;">No items found</td></tr>'}
+                  </tbody>
+                </table>
+              </div>
 
               <div class="total-block">
-                <div class="total-line"><span>TOTAL</span><span>₹${total}</span></div>
-                ${bill.payment_status !== 'Paid' ? `
-                  <div class="meta" style="margin-bottom: 0;">
-                    <div class="row"><span>Paid Amount</span><span>₹${Number(bill.paid_amount || 0).toFixed(2)}</span></div>
-                    <div class="row" style="font-weight: bold;"><span>Balance Due</span><span>₹${Number(bill.remaining_amount || 0).toFixed(2)}</span></div>
-                  </div>
+                <div class="total-line"><span>Subtotal</span><span>₹${total}</span></div>
+                ${Math.max(0, Number(bill.total_amount) - Number(bill.paid_amount || 0)) > 0 ? `
+                  <div class="total-line"><span>Paid Amount</span><span>₹${Number(bill.paid_amount || 0).toFixed(2)}</span></div>
+                  <div class="total-line" style="font-weight: bold; color: #EF4444;"><span>Balance Due</span><span>₹${Math.max(0, Number(bill.total_amount) - Number(bill.paid_amount || 0)).toFixed(2)}</span></div>
                 ` : ''}
+                <div class="total-final"><span>Total</span><span>₹${total}</span></div>
+                <div class="total-line" style="margin-top: 8px; font-weight: bold; font-size: 12px;">
+                  <span style="text-transform: uppercase; color: #666;">Status</span>
+                  <span style="color: ${Math.max(0, Number(bill.total_amount) - Number(bill.paid_amount || 0)) === 0 ? '#10B981' : Number(bill.paid_amount || 0) === 0 ? '#EF4444' : '#F59E0B'}">
+                    ${Math.max(0, Number(bill.total_amount) - Number(bill.paid_amount || 0)) === 0 ? 'PAID' : Number(bill.paid_amount || 0) === 0 ? 'PENDING' : 'PARTIAL'}
+                  </span>
+                </div>
               </div>
 
               <div class="footer">
-                <p style="margin: 0 0 4px; font-weight: bold; font-size: 14px;">THANK YOU!</p>
-                <p style="margin: 0; font-size: 11px;">Please visit again</p>
+                <p style="margin: 0 0 4px; font-weight: bold; font-size: 12px; color: #555;">Thank you for your business!</p>
+                <p style="margin: 0;">This is a computer-generated invoice and requires no signature.</p>
               </div>
             </div>
           </body>
@@ -357,9 +391,12 @@ const Dashboard = () => {
                   fontWeight: 600,
                   padding: '4px 8px',
                   borderRadius: '4px',
+                  background: recentBills[0].status === 'Paid' ? '#4A8C5C20' : recentBills[0].status === 'Partial' ? '#F59E0B20' : '#C0572A20',
+                  color: recentBills[0].status === 'Paid' ? '#2F855A' : recentBills[0].status === 'Partial' ? '#D97706' : '#C0572A',
                   background: Math.max(0, Number(recentBills[0].total_amount) - Number(recentBills[0].paid_amount || 0)) === 0 ? '#4A8C5C20' : Number(recentBills[0].paid_amount || 0) > 0 ? '#F59E0B20' : '#C0572A20',
                   color: Math.max(0, Number(recentBills[0].total_amount) - Number(recentBills[0].paid_amount || 0)) === 0 ? '#2F855A' : Number(recentBills[0].paid_amount || 0) > 0 ? '#D97706' : '#C0572A',
                 }}>
+                  {recentBills[0].status || 'Pending'}
                   {Math.max(0, Number(recentBills[0].total_amount) - Number(recentBills[0].paid_amount || 0)) === 0 ? 'Paid' : Number(recentBills[0].paid_amount || 0) > 0 ? 'Partial' : 'Pending'}
                 </span>
               </div>
