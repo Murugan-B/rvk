@@ -1,8 +1,6 @@
-import React from 'react';
 import React, { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, Package, FileText, Settings, LogOut, History } from 'lucide-react';
 import { LayoutDashboard, Package, FileText, Settings as SettingsIcon, LogOut, History } from 'lucide-react';
 import { supabase } from '../services/supabase';
 
@@ -43,7 +41,6 @@ export const Sidebar = () => {
     { to: '/inventory', icon: <Package size={20} />, label: 'Inventory' },
     { to: '/billing', icon: <FileText size={20} />, label: 'Billing' },
     { to: '/billing-history', icon: <History size={20} />, label: 'Billing History' },
-    { to: '/settings', icon: <Settings size={20} />, label: 'Settings' },
     { to: '/settings', icon: <SettingsIcon size={20} />, label: 'Settings' },
   ];
 
@@ -59,15 +56,11 @@ export const Sidebar = () => {
       }}
     >
       <div 
-        className="p-4 md:p-6 text-2xl font-bold border-b" 
         className="p-4 md:p-6 border-b flex flex-col items-start gap-4" 
         style={{ 
-          fontFamily: 'var(--font-serif)', 
-          borderColor: 'var(--bg-sidebar-hover)',
-          color: 'var(--accent-primary)'
+          borderColor: 'var(--bg-sidebar-hover)'
         }}
       >
-        Stock Billing
         {settings.logo_url && (
           <img 
             src={settings.logo_url} 
@@ -123,3 +116,4 @@ export const Sidebar = () => {
     </div>
   );
 };
+
